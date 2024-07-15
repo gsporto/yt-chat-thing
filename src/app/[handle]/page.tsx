@@ -4,9 +4,9 @@ import { parse } from "node-html-parser";
 export const runtime = "edge";
 
 async function getLiveId(handle: string) {
-  const html = await fetch(`https://www.youtube.com/${handle}/live`).then((v) =>
-    v.text()
-  );
+  const html = await fetch(`https://www.youtube.com/${handle}/live`, {
+    cache: "no-store",
+  }).then((v) => v.text());
 
   const doc = parse(html);
 
