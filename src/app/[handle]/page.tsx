@@ -1,10 +1,12 @@
 import { BASE_URL } from "@/helper/url";
 
 async function getLiveId(handle: string) {
-  const html = await fetch(
-    `https://www.youtube.com/${handle}/live`
-  ).then((v) => v.text());
-  return html.split('<link rel="canonical" href="https://www.youtube.com/watch?v=')[1].split('"')[0];
+  const html = await fetch(`https://www.youtube.com/${handle}/live`).then((v) =>
+    v.text()
+  );
+  return html
+    .split('<link rel="canonical" href="https://www.youtube.com/watch?v=')[1]
+    .split('"')[0];
 }
 
 export default async function Home({
@@ -13,7 +15,7 @@ export default async function Home({
   params: { handle: string };
 }) {
   const liveId = await getLiveId(handle);
-  
+
   const { hostname } = new URL(BASE_URL);
 
   return (
