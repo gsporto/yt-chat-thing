@@ -1,7 +1,7 @@
 export function GithubLink() {
   return (
     <a
-      href="https://github.com/gsporto"
+      href="https://github.com/gsporto/youtube-chat-thing"
       style={{
         position: "absolute",
         top: 8,
