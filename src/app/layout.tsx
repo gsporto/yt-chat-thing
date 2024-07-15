@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+
+import { GithubLink } from "@/components/GithubLink";
+
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -12,7 +15,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {children}
+        <GithubLink />
+      </body>
     </html>
   );
 }
