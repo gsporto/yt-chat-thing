@@ -9,8 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@litejs/dom": "^24.7.0",
     "next": "14.2.5",
+    "node-html-parser": "^6.1.13",
     "react": "^18",
     "react-dom": "^18"
   },

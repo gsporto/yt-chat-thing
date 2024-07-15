@@ -1,5 +1,5 @@
 import { BASE_URL } from "@/helper/url";
-import { DOMParser } from "@litejs/dom";
+import { parse } from "node-html-parser";
 
 export const runtime = "edge";
 
@@ -8,8 +8,7 @@ async function getLiveId(handle: string) {
     v.text()
   );
 
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, "text/html");
+  const doc = parse(html);
 
   const linkElement = doc.querySelector('link[rel="canonical"]');
   if (!linkElement) return;
