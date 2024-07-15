@@ -32,6 +32,24 @@ export default async function Home({
 
   const { hostname } = new URL(BASE_URL);
 
+  if (!liveId) {
+    return (
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          fontFamily: "sans-serif",
+          color: "white",
+        }}
+      >
+        <h1>No Live Found</h1>
+      </div>
+    );
+  }
+
   return (
     <iframe
       src={`https://www.youtube.com/live_chat?v=${liveId}&embed_domain=${hostname}`}
