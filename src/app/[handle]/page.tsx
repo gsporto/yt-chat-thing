@@ -1,4 +1,5 @@
 import { BASE_URL } from "@/helper/url";
+import { cookies } from "next/headers";
 import { parse } from "node-html-parser";
 
 export const runtime = "edge";
@@ -31,6 +32,8 @@ export default async function Home({
 
   const { hostname } = new URL(BASE_URL);
 
+  const theme = cookies().get("theme")?.value ?? "dark";
+
   if (!liveId) {
     return (
       <div
@@ -51,7 +54,7 @@ export default async function Home({
 
   return (
     <iframe
-      src={`https://www.youtube.com/live_chat?v=${liveId}&embed_domain=${hostname}`}
+      src={`https://www.youtube.com/live_chat?is_popout=1&v=${liveId}&embed_domain=${hostname}&theme=${theme}`}
       style={{ width: "100%", height: "100%", border: "none" }}
     />
   );

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-
-import { GithubLink } from "@/components/GithubLink";
+import { IconBar } from "@/components/icon-bar";
 
 import "./globals.css";
 
@@ -17,7 +16,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         {children}
-        <GithubLink />
+        <IconBar />
       </body>
     </html>
   );
