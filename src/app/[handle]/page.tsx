@@ -20,6 +20,10 @@ async function getLiveId(handle: string) {
   const videoIdMatch = url.match(/v=([^&]+)/);
   if (!videoIdMatch?.[1]) return;
 
+  if(!videoIdMatch?.[1]) {
+    console.error(linkElement.toString());
+  }
+
   return videoIdMatch[1];
 }
 
