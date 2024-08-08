@@ -1,6 +1,6 @@
 const BASE_URL = (
   process.env.NODE_ENV === "production"
-    ? `https://${process.env.VERCEL_URL}`
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
     : process.env.__NEXT_PRIVATE_ORIGIN
 ) as string;
 
