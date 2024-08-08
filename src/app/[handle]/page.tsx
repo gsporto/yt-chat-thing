@@ -34,6 +34,24 @@ export default async function Home({
   params: { handle: string };
   searchParams: { debug: string };
 }) {
+  if (!handle) {
+    return (
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          fontFamily: "sans-serif",
+          color: "white",
+        }}
+      >
+        <h1>No handle provided</h1>
+      </div>
+    );
+  }
+
   const { liveId, html } = (await getLiveId(handle, debug === "true")) ?? {};
 
   const { hostname } = new URL(BASE_URL);
