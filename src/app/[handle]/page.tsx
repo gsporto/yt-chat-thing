@@ -4,10 +4,14 @@ import { parse } from "node-html-parser";
 
 export const runtime = "edge";
 
-async function getLiveId(handle: string) {
+async function getLiveId(handle: string, debug: boolean) {
   const html = await fetch(`https://www.youtube.com/${handle}/live`, {
     cache: "no-store",
   }).then((v) => v.text());
+
+  if (debug) {
+    return { html };
+  }
 
   const doc = parse(html);
 
@@ -20,19 +24,17 @@ async function getLiveId(handle: string) {
   const videoIdMatch = url.match(/v=([^&]+)/);
   if (!videoIdMatch?.[1]) return;
 
-  if(!videoIdMatch?.[1]) {
-    console.error(linkElement.toString());
-  }
-
-  return videoIdMatch[1];
+  return { liveId: videoIdMatch[1], html: debug ? html : "" };
 }
 
 export default async function Home({
   params: { handle },
+  searchParams: { debug },
 }: {
   params: { handle: string };
+  searchParams: { debug: string };
 }) {
-  const liveId = await getLiveId(handle);
+  const { liveId, html } = (await getLiveId(handle, debug === "true")) ?? {};
 
   const { hostname } = new URL(BASE_URL);
 
@@ -52,6 +54,8 @@ export default async function Home({
         }}
       >
         <h1>No Live Found</h1>
+        <pre style={{ display: "none" }}>{html}</pre>
+        <pre style={{ display: "none" }}>{handle}</pre>
       </div>
     );
   }
