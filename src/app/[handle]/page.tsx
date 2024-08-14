@@ -1,6 +1,14 @@
 import { BASE_URL } from "@/helper/url";
+import dynamic from "next/dynamic";
 import { cookies } from "next/headers";
 import { parse } from "node-html-parser";
+
+const YoutubeIframe = dynamic(
+  () => import("./components/youtube-iframe").then((mod) => mod.YoutubeIframe),
+  {
+    ssr: false,
+  }
+);
 
 export const runtime = "edge";
 
@@ -78,10 +86,5 @@ export default async function Home({
     );
   }
 
-  return (
-    <iframe
-      src={`https://www.youtube.com/live_chat?is_popout=1&v=${liveId}&embed_domain=${hostname}&theme=${theme}`}
-      style={{ width: "100%", height: "100%", border: "none" }}
-    />
-  );
+  return <YoutubeIframe liveId={liveId} theme={theme} />;
 }
