@@ -13,7 +13,7 @@ const YoutubeIframe = dynamic(
 export const runtime = "edge";
 
 async function getLiveId(handle: string, debug: boolean) {
-  const html = await fetch(`https://www.youtube.com/${handle}/live`, {
+  const html = await fetch(`https://api.codetabs.com/v1/proxy/?quest=https://www.youtube.com/${handle}/live`, {
     cache: "no-store",
   }).then((v) => v.text());
 
