@@ -14,7 +14,7 @@ export const runtime = "edge";
 
 async function getLiveId(handle: string, debug: boolean) {
   const html = await fetch(`https://api.codetabs.com/v1/proxy/?quest=https://www.youtube.com/${handle}/live`, {
-    cache: "no-store",
+    next: { revalidate: 60 },
   }).then((v) => v.text());
 
   if (debug) {
