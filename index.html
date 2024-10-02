@@ -15,11 +15,14 @@
 
     html,
     body {
-      width: 100vw;
-      height: 100vh;
+      width: 100dvw;
+      height: 100dvh;
       overflow: hidden;
       position: relative;
       background-color: #0f0f0f;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     .chat-iframe {
@@ -29,17 +32,35 @@
     }
 
     .no-user {
-      width: 100dvw;
-      height: 100dvh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
       font-family: sans-serif;
       color: white;
+    }
+
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 5px solid #fff;
+      border-bottom-color: transparent;
+      border-radius: 50%;
+      display: inline-block;
+      box-sizing: border-box;
+      animation: rotation 1s linear infinite;
+      position: fixed;
+    }
+
+    @keyframes rotation {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
     }
   </style>
 
   <body>
+    <span class="spinner" />
+
     <template id="iframe-template">
       <iframe
         frameborder="0"
@@ -50,9 +71,7 @@
     </template>
 
     <template id="no-user-template">
-      <div class="no-user">
-        <h1>No user provided</h1>
-      </div>
+      <h1 class="no-user">No user provided</h1>
     </template>
 
     <script>
@@ -132,8 +151,12 @@
       async function setup() {
         if (!user) {
           setupNoUser();
+          document.querySelector(".spinner").remove();
         } else {
-          setupChat();
+          await setupChat();
+          document.querySelector("iframe").addEventListener("load", () => {
+            document.querySelector(".spinner").remove();
+          });
         }
       }
 
