@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Youtube Chat Thing</title>
+  </head>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      padding: 0;
+      margin: 0;
+    }
+
+    html,
+    body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+      background-color: #0f0f0f;
+    }
+
+    .chat-iframe {
+      width: 100dvw;
+      height: 100dvh;
+      border: none;
+    }
+
+    .no-user {
+      width: 100dvw;
+      height: 100dvh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: sans-serif;
+      color: white;
+    }
+  </style>
+
+  <body>
+    <template id="iframe-template">
+      <iframe
+        frameborder="0"
+        class="chat-iframe"
+        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen
+      ></iframe>
+    </template>
+
+    <template id="no-user-template">
+      <div class="no-user">
+        <h1>No user provided</h1>
+      </div>
+    </template>
+
+    <script>
+      const hostname = window.location.hostname;
+      const theme = "dark";
+      const user = window.location.pathname.split("/")[1];
+      const proxies = [
+        "https://corsproxy.io/?",
+        "https://api.codetabs.com/v1/proxy/?quest=",
+        "https://api.allorigins.win/get?url=",
+        "https://corsmirror.onrender.com/v1/cors?url=",
+      ];
+
+      /**
+       * Get the liveId of a youtube channel
+       * @param {string} handle - The handle of the channel
+       * @returns {Promise<{ liveId: string }>} - The liveId of the channel
+       */
+      async function getLiveId(handle, index = 0) {
+        try {
+          const html = await fetch(
+            `${proxies[index]}${encodeURIComponent(
+              `https://www.youtube.com/${handle}/live`
+            )}`
+          ).then(async (v) => {
+            const contentType = v.headers.get("content-type");
+            if (contentType && contentType.includes("application/json")) {
+              const json = await v.json();
+              return json.contents;
+            } else {
+              return v.text();
+            }
+          });
+
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, "text/html");
+
+          const linkElement = doc.querySelector('link[rel="canonical"]');
+          const url = linkElement.getAttribute("href");
+          const videoIdMatch = url.match(/v=([^&]+)/);
+          if (!videoIdMatch?.[1]) {
+            throw new Error("No video id found");
+          }
+
+          return { liveId: videoIdMatch[1] };
+        } catch (error) {
+          return getLiveId(handle, index + 1);
+        }
+      }
+
+      /**
+       * Setup the chat iframe
+       */
+      async function setupChat() {
+        const { liveId } = await getLiveId(user);
+        const url = `https://www.youtube.com/live_chat?v=${liveId}&is_popout=1&embed_domain=${hostname}&theme=${theme}`;
+
+        const iframeTemplate = document.getElementById("iframe-template");
+        if (!iframeTemplate) return;
+        /** @type {DocumentFragment} */
+        const clone = iframeTemplate.content.cloneNode(true);
+        const iframe = clone.querySelector("iframe");
+        iframe.src = url;
+
+        document.body.appendChild(clone);
+      }
+
+      /**
+       * Setup the no user template
+       */
+      function setupNoUser() {
+        const noUserTemplate = document.getElementById("no-user-template");
+        if (!noUserTemplate) return;
+        document.body.appendChild(noUserTemplate.content.cloneNode(true));
+      }
+
+      async function setup() {
+        if (!user) {
+          setupNoUser();
+        } else {
+          setupChat();
+        }
+      }
+
+      setup();
+    </script>
+  </body>
+</html>
