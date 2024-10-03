@@ -31,7 +31,7 @@
       border: none;
     }
 
-    .no-user {
+    .text {
       font-family: sans-serif;
       color: white;
     }
@@ -71,7 +71,11 @@
     </template>
 
     <template id="no-user-template">
-      <h1 class="no-user">No user provided</h1>
+      <h1 class="text">No user provided</h1>
+    </template>
+    
+    <template id="no-live-template">
+      <h1 class="text">No Live Found</h1>
     </template>
 
     <script>
@@ -82,7 +86,6 @@
         "https://corsproxy.io/?",
         "https://api.codetabs.com/v1/proxy/?quest=",
         "https://api.allorigins.win/get?url=",
-        "https://corsmirror.onrender.com/v1/cors?url=",
       ];
 
       /**
@@ -92,6 +95,7 @@
        */
       async function getLiveId(handle, index = 0) {
         try {
+          if (index >= proxies.length) return { liveId: null };
           const html = await fetch(
             `${proxies[index]}${encodeURIComponent(
               `https://www.youtube.com/${handle}/live`
@@ -112,6 +116,7 @@
           const linkElement = doc.querySelector('link[rel="canonical"]');
           const url = linkElement.getAttribute("href");
           const videoIdMatch = url.match(/v=([^&]+)/);
+
           if (!videoIdMatch?.[1]) {
             throw new Error("No video id found");
           }
@@ -127,6 +132,7 @@
        */
       async function setupChat() {
         const { liveId } = await getLiveId(user);
+        if (!liveId) return false;
         const url = `https://www.youtube.com/live_chat?v=${liveId}&is_popout=1&embed_domain=${hostname}&theme=${theme}`;
 
         const iframeTemplate = document.getElementById("iframe-template");
@@ -137,6 +143,8 @@
         iframe.src = url;
 
         document.body.appendChild(clone);
+
+        return true
       }
 
       /**
@@ -148,12 +156,25 @@
         document.body.appendChild(noUserTemplate.content.cloneNode(true));
       }
 
+      /**
+       * Setup the no live template
+       */
+      function setupNoLive() {
+        const noLiveTemplate = document.getElementById("no-live-template");
+        if (!noLiveTemplate) return;
+        document.body.appendChild(noLiveTemplate.content.cloneNode(true));
+      }
+
       async function setup() {
         if (!user) {
           setupNoUser();
           document.querySelector(".spinner").remove();
         } else {
-          await setupChat();
+          const success = await setupChat();
+          if (!success) {
+            setupNoLive();
+            document.querySelector(".spinner").remove();
+          }
           document.querySelector("iframe").addEventListener("load", () => {
             document.querySelector(".spinner").remove();
           });
