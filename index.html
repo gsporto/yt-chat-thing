@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="https://www.youtube.com/s/desktop/711fd789/img/logos/favicon_32x32.png" sizes="32x32">
     <title>Youtube Chat Thing</title>
   </head>
 
@@ -258,6 +259,7 @@
       }
 
       async function setup() {
+        document.title = `${user} - Youtube Chat Thing`;
         document.body.classList.toggle("dark", theme !== "dark");
         if (!user) {
           setupNoUser();
