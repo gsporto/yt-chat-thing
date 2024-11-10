@@ -259,12 +259,12 @@
       }
 
       async function setup() {
-        document.title = `${user} - Youtube Chat Thing`;
         document.body.classList.toggle("dark", theme !== "dark");
         if (!user) {
           setupNoUser();
           document.querySelector(".spinner").remove();
         } else {
+          document.title = `${user} - Youtube Chat Thing`;
           const success = await setupChat();
           if (!success) {
             setupNoLive();
