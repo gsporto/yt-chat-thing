@@ -17,11 +17,19 @@
     :root {
       --theme-bg: #0f0f0f;
       --theme-bg-foreground: #f0f0f0;
+      --theme-overlay: rgba(0, 0, 0, 0.7);
+      --theme-modal-bg: #1f1f1f;
+      --theme-modal-border: #3f3f3f;
+      --theme-accent: #ff0000;
     }
 
     .dark {
       --theme-bg: #f0f0f0;
       --theme-bg-foreground: #0f0f0f;
+      --theme-overlay: rgba(255, 255, 255, 0.7);
+      --theme-modal-bg: #e0e0e0;
+      --theme-modal-border: #c0c0c0;
+      --theme-accent: #cc0000;
     }
 
     html,
@@ -96,6 +104,108 @@
         transform: rotate(360deg);
       }
     }
+
+    /* Modal styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: var(--theme-overlay);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal {
+      background-color: var(--theme-modal-bg);
+      border-radius: 8px;
+      border: 1px solid var(--theme-modal-border);
+      padding: 24px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .modal-header svg {
+      width: 24px;
+      height: 24px;
+      margin-right: 12px;
+      color: var(--theme-accent);
+    }
+
+    .modal-title {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--theme-bg-foreground);
+    }
+
+    .modal-content {
+      margin-bottom: 20px;
+      color: var(--theme-bg-foreground);
+      line-height: 1.5;
+    }
+
+    .modal-content p {
+      margin-bottom: 12px;
+    }
+
+    .modal-content ol {
+      margin-left: 24px;
+      margin-bottom: 12px;
+    }
+
+    .modal-content li {
+      margin-bottom: 8px;
+    }
+
+    .modal-content img {
+      max-width: 100%;
+      border-radius: 4px;
+      margin: 8px 0;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    .modal-button {
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .primary-button {
+      background-color: var(--theme-accent);
+      color: white;
+      border: none;
+    }
+
+    .primary-button:hover {
+      background-color: #cc0000;
+    }
+
+    .secondary-button {
+      background-color: transparent;
+      color: var(--theme-bg-foreground);
+      border: 1px solid var(--theme-modal-border);
+    }
+
+    .secondary-button:hover {
+      background-color: rgba(128, 128, 128, 0.1);
+    }
   </style>
 
   <body>
@@ -133,6 +243,12 @@
           </g>
         </svg>
       </button>
+
+      <button id="firefox-help-button" onclick="showFirefoxModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h2v2h-2v-2zm0-10h2v8h-2V7z"/>
+        </svg>
+      </button>
     </div>
 
     <template id="iframe-template">
@@ -152,6 +268,33 @@
       <h1 class="text">No Live Found</h1>
     </template>
 
+    <template id="firefox-modal-template">
+      <div class="modal-overlay">
+        <div class="modal">
+          <div class="modal-header">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h2v2h-2v-2zm0-10h2v8h-2V7z"/>
+            </svg>
+            <h2 class="modal-title">Firefox Enhanced Tracking Protection</h2>
+          </div>
+          <div class="modal-content text">
+            <p>Firefox's Enhanced Tracking Protection may block access to YouTube user data, preventing this app from working correctly.</p>
+            <p>To disable this protection for this site:</p>
+            <ol>
+              <li>Click the shield icon in the address bar</li>
+              <li>Toggle "Enhanced Tracking Protection" to OFF for this site</li>
+              <li>Refresh the page</li>
+            </ol>
+            <p>This will allow the app to access YouTube data while maintaining protection on other sites.</p>
+          </div>
+          <div class="modal-actions">
+            <button class="modal-button secondary-button" onclick="dismissFirefoxModal(false)">Don't show again</button>
+            <button class="modal-button primary-button" onclick="dismissFirefoxModal(true)">Got it</button>
+          </div>
+        </div>
+      </div>
+    </template>
+
     <script>
       const hostname = window.location.hostname;
       const theme = localStorage.getItem("theme") || "dark";
@@ -161,6 +304,48 @@
         "https://api.codetabs.com/v1/proxy/?quest=",
         "https://api.allorigins.win/get?url=",
       ];
+
+      // Firefox detection and modal handling
+      const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+      const firefoxModalShown = localStorage.getItem("firefoxModalShown") === "true";
+      const firefoxHelpButton = document.getElementById("firefox-help-button");
+
+      // Hide Firefox help button if not using Firefox
+      if (!isFirefox) {
+        firefoxHelpButton.style.display = "none";
+      }
+
+      /**
+       * Show the Firefox warning modal
+       */
+      function showFirefoxModal() {
+        const modalTemplate = document.getElementById("firefox-modal-template");
+        if (!modalTemplate) return;
+        
+        // Remove any existing modal first
+        const existingModal = document.querySelector(".modal-overlay");
+        if (existingModal) {
+          existingModal.remove();
+        }
+        
+        const clone = modalTemplate.content.cloneNode(true);
+        document.body.appendChild(clone);
+      }
+
+      /**
+       * Dismiss the Firefox warning modal
+       * @param {boolean} showAgain - Whether to show the modal again in the future
+       */
+      function dismissFirefoxModal(showAgain) {
+        const modal = document.querySelector(".modal-overlay");
+        if (modal) {
+          modal.remove();
+        }
+        
+        if (!showAgain) {
+          localStorage.setItem("firefoxModalShown", "true");
+        }
+      }
 
       /**
        * Get the liveId of a youtube channel
@@ -260,6 +445,12 @@
 
       async function setup() {
         document.body.classList.toggle("dark", theme !== "dark");
+        
+        // Show Firefox modal on first access if using Firefox
+        if (isFirefox && !firefoxModalShown) {
+          showFirefoxModal();
+        }
+        
         if (!user) {
           setupNoUser();
           document.querySelector(".spinner").remove();
