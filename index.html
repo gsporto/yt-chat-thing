@@ -129,25 +129,6 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
-    .modal-header {
-      display: flex;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-
-    .modal-header svg {
-      width: 24px;
-      height: 24px;
-      margin-right: 12px;
-      color: var(--theme-accent);
-    }
-
-    .modal-title {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: var(--theme-bg-foreground);
-    }
-
     .modal-content {
       margin-bottom: 20px;
       color: var(--theme-bg-foreground);
@@ -271,21 +252,15 @@
     <template id="firefox-modal-template">
       <div class="modal-overlay">
         <div class="modal">
-          <div class="modal-header">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h2v2h-2v-2zm0-10h2v8h-2V7z"/>
-            </svg>
-            <h2 class="modal-title">Firefox Enhanced Tracking Protection</h2>
-          </div>
           <div class="modal-content text">
-            <p>Firefox's Enhanced Tracking Protection may block access to YouTube user data, preventing this app from working correctly.</p>
-            <p>To disable this protection for this site:</p>
+            <p>It seems that Firefox's Enhanced Tracking Protection might be preventing access to YouTube user data, which could affect how this app works.</p>
+            <p>To allow this app to function properly, you can adjust the settings for this site:</p>
             <ol>
               <li>Click the shield icon in the address bar</li>
               <li>Toggle "Enhanced Tracking Protection" to OFF for this site</li>
               <li>Refresh the page</li>
             </ol>
-            <p>This will allow the app to access YouTube data while maintaining protection on other sites.</p>
+            <p>This will help the app access YouTube data while keeping your protection on other sites.</p>
           </div>
           <div class="modal-actions">
             <button class="modal-button secondary-button" onclick="dismissFirefoxModal(false)">Don't show again</button>
